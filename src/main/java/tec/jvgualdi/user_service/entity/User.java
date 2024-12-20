@@ -6,12 +6,12 @@ import tec.jvgualdi.user_service.dto.UserRequest;
 
 import java.time.LocalDateTime;
 
-@Entity(name = "users")
+@Entity(name = "User")
 @Table(name = "users")
-@AllArgsConstructor
-@NoArgsConstructor
-@EqualsAndHashCode(of = "id")
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(of = "id")
 public class User {
 
     @Id
