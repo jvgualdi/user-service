@@ -1,21 +1,26 @@
 package tec.jvgualdi.user_service.entity;
 
 import jakarta.persistence.*;
-import tec.jvgualdi.user_service.dto.UserRequest;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import tec.jvgualdi.user_service.dto.UserRequestDTO;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 @Entity(name = "User")
 @Table(name = "users")
-public class User {
+public class User  implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Column(nullable = false, unique = true, length = 50)
-    private String username;
+    private String name;
 
     @Column(nullable = false, unique = true, length = 50)
     private String email;
@@ -29,37 +34,62 @@ public class User {
     @Column(name = "active", nullable = false)
     private boolean active = true;
 
-    public User(long id, String username, String email, String password, LocalDateTime createdAt, boolean active) {
+    public User(long id, String name, String email, String password, LocalDateTime createdAt, boolean active) {
         this.id = id;
-        this.username = username;
+        this.name = name;
         this.email = email;
         this.password = password;
         this.createdAt = createdAt;
         this.active = active;
     }
 
-    public User(UserRequest user) {
-        this.email = user.email();
-        this.username = user.username();
-        this.password = user.password();
+    public User(){}
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
-    public User(){}
+    @Override
+    public String getPassword() {
+        return this.password;
+    }
+
+    @Override
+    public String getUsername() {
+        return this.email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return UserDetails.super.isAccountNonExpired();
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return UserDetails.super.isAccountNonLocked();
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return UserDetails.super.isCredentialsNonExpired();
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return UserDetails.super.isEnabled();
+    }
 
     public long getId() {
         return id;
     }
 
-    public String getUsername() {
-        return username;
+    public String getName() {
+        return name;
     }
 
     public String getEmail() {
         return email;
-    }
-
-    public String getPassword() {
-        return password;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -74,8 +104,8 @@ public class User {
         this.id = id;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public void setEmail(String email) {

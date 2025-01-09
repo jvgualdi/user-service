@@ -24,4 +24,10 @@ spring:
 
 logging:
   level:
+    org.springframework.security: DEBUG
+    org.springframework.boot: INFO
     org.hibernate.SQL: DEBUG
+
+security:
+    jwt:
+      secret: ${JWT_SECRET:12345678}

@@ -3,41 +3,48 @@ package tec.jvgualdi.user_service.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import tec.jvgualdi.user_service.dto.UserDetails;
-import tec.jvgualdi.user_service.dto.UserRequest;
+import tec.jvgualdi.user_service.dto.UserResponseDTO;
+import tec.jvgualdi.user_service.dto.UserRequestDTO;
 import tec.jvgualdi.user_service.entity.User;
 import tec.jvgualdi.user_service.repository.UserRepository;
 
 @Service
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserDetails createUser(UserRequest user) {
-        var userEntity = userRepository.findByEmail(user.email());
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+
+    public UserResponseDTO createUser(UserRequestDTO user) {
+        var userEntity = this.userRepository.findByEmail(user.email());
         if (userEntity.isPresent()) {
             throw new RuntimeException("User already exists");
         }
-        userEntity = userRepository.findByUsername(user.username());
-        if (userEntity.isPresent()) {
-            throw new RuntimeException("User already exists");
-        }
-
-        return new UserDetails(userRepository.save(new User(user)));
+        User newUser = new User();
+        newUser.setEmail(user.email());
+        newUser.setName(user.name());
+        newUser.setPassword(passwordEncoder.encode(user.password()));
+        return new UserResponseDTO(this.userRepository.save(newUser));
     }
 
-    public Page<UserDetails> getAllUsers(Pageable pageableUser) {
-        return userRepository.findAllByActiveTrue(pageableUser).map(UserDetails::new);
+    public Page<UserResponseDTO> getAllUsers(Pageable pageableUser) {
+        return this.userRepository.findAllByActiveTrue(pageableUser).map(UserResponseDTO::new);
     }
 
-    public UserDetails getUserDetails(Long userId) {
-        return new UserDetails(userRepository.getReferenceById(userId));
+    public UserResponseDTO getUserDetails(Long userId) {
+        return new UserResponseDTO(this.userRepository.getReferenceById(userId));
     }
 
     public void deleteUser(Long userId){
-        var user = userRepository.getReferenceById(userId);
+        var user = this.userRepository.getReferenceById(userId);
         user.setActive(false);
     }
 
