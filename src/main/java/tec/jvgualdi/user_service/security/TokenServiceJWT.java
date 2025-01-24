@@ -7,6 +7,7 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import tec.jvgualdi.user_service.domain.entity.User;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -19,12 +20,15 @@ public class TokenServiceJWT {
     private String jwtSecret;
 
     public String generateToken(Authentication authentication) {
+        var user = (User) authentication.getPrincipal();
+
         try {
             Algorithm algorithm = Algorithm.HMAC256(jwtSecret);
             return JWT.create()
                     .withIssuer("e-commerce")
-                    .withSubject(authentication.getName())
+                    .withSubject(user.getEmail())
                     .withExpiresAt(generateExpirationDate())
+                    .withClaim("role", user.getRole().name())
                     .sign(algorithm);
         } catch (JWTCreationException exception){
             throw new RuntimeException(exception);
@@ -44,6 +48,19 @@ public class TokenServiceJWT {
                     .verify(tokenJWT)
                     .getSubject();
         } catch (JWTVerificationException exception){
+            throw new RuntimeException("Invalid or expired JWT token");
+        }
+    }
+
+    public String extractRole(String tokenJWT) {
+        try {
+            Algorithm algorithm = Algorithm.HMAC256(jwtSecret);
+            return JWT.require(algorithm)
+                    .build()
+                    .verify(tokenJWT)
+                    .getClaim("role")
+                    .asString();
+        } catch (JWTVerificationException exception) {
             throw new RuntimeException("Invalid or expired JWT token");
         }
     }

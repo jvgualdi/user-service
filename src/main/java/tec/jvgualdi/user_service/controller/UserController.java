@@ -8,7 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 import tec.jvgualdi.user_service.dto.UserResponseDTO;
@@ -26,7 +26,6 @@ public class UserController {
 
 
     @PostMapping
-    @Transactional
     public ResponseEntity<UserResponseDTO> createUser(@RequestBody @Valid UserRequestDTO user, UriComponentsBuilder uriBuilder) {
         var userDetail = userService.createUser(user);
         var uri = uriBuilder.path("/users/{id}").buildAndExpand(userDetail.id()).toUri();
@@ -46,7 +45,7 @@ public class UserController {
     }
 
     @DeleteMapping("{id}")
-    @Transactional
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
