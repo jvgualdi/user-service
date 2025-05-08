@@ -6,13 +6,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tec.jvgualdi.user_service.domain.enums.UserRole;
-import tec.jvgualdi.user_service.dto.RegisterEmployeeDTO;
-import tec.jvgualdi.user_service.dto.UserResponseDTO;
-import tec.jvgualdi.user_service.dto.UserRequestDTO;
 import tec.jvgualdi.user_service.domain.entity.User;
+import tec.jvgualdi.user_service.dto.EmployeeRequest;
+import tec.jvgualdi.user_service.dto.UserRequest;
+import tec.jvgualdi.user_service.dto.UserResponse;
 import tec.jvgualdi.user_service.repository.UserRepository;
-
-import java.time.LocalDateTime;
 
 @Service
 public class UserService {
@@ -26,23 +24,23 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponseDTO createEmployee(RegisterEmployeeDTO employeeDTO) {
-        if (userRepository.existsByEmail(employeeDTO.email())) {
+    public UserResponse createEmployee(EmployeeRequest employeeDTO) {
+        if (userRepository.existsByEmail(employeeDTO.user().email())) {
             throw new IllegalArgumentException("Email already in use");
         }
 
         User employee = new User();
-        employee.setEmail(employeeDTO.email());
-        employee.setName(employeeDTO.name());
-        employee.setPassword(passwordEncoder.encode(employeeDTO.password()));
+        employee.setEmail(employeeDTO.user().email());
+        employee.setName(employeeDTO.user().name());
+        employee.setPassword(passwordEncoder.encode(employeeDTO.user().password()));
         employee.setRole(UserRole.EMPLOYEE);
         employee.setVerified(true);
 
-        return new UserResponseDTO(userRepository.save(employee));
+        return new UserResponse(userRepository.save(employee));
     }
 
     @Transactional
-    public UserResponseDTO createUser(UserRequestDTO user) {
+    public UserResponse createUser(UserRequest user) {
         if (userRepository.existsByEmail(user.email())) {
             throw new IllegalArgumentException("User already exists");
         }
@@ -52,16 +50,16 @@ public class UserService {
         newUser.setName(user.name());
         newUser.setPassword(passwordEncoder.encode(user.password()));
         newUser.setRole(UserRole.CUSTOMER);
-        return new UserResponseDTO(userRepository.save(newUser));
+        return new UserResponse(userRepository.save(newUser));
     }
 
 
-    public Page<UserResponseDTO> getAllUsers(Pageable pageableUser) {
-        return this.userRepository.findAllByActiveTrue(pageableUser).map(UserResponseDTO::new);
+    public Page<UserResponse> getAllUsers(Pageable pageableUser) {
+        return this.userRepository.findAllByActiveTrue(pageableUser).map(UserResponse::new);
     }
 
-    public UserResponseDTO getUserDetails(Long userId) {
-        return new UserResponseDTO(this.userRepository.findById(userId)
+    public UserResponse getUserDetails(Long userId) {
+        return new UserResponse(this.userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found")));
     }
 

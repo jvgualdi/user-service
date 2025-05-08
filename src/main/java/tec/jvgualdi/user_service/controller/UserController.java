@@ -11,8 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
-import tec.jvgualdi.user_service.dto.UserResponseDTO;
-import tec.jvgualdi.user_service.dto.UserRequestDTO;
+import tec.jvgualdi.user_service.dto.UserRequest;
+import tec.jvgualdi.user_service.dto.UserResponse;
 import tec.jvgualdi.user_service.service.UserService;
 
 
@@ -26,7 +26,7 @@ public class UserController {
 
 
     @PostMapping
-    public ResponseEntity<UserResponseDTO> createUser(@RequestBody @Valid UserRequestDTO user, UriComponentsBuilder uriBuilder) {
+    public ResponseEntity<UserResponse> createUser(@RequestBody @Valid UserRequest user, UriComponentsBuilder uriBuilder) {
         var userDetail = userService.createUser(user);
         var uri = uriBuilder.path("/users/{id}").buildAndExpand(userDetail.id()).toUri();
 
@@ -34,13 +34,13 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<UserResponseDTO>> listUsers(@PageableDefault(size = 3) Pageable pageableUser) {
+    public ResponseEntity<Page<UserResponse>> listUsers(@PageableDefault(size = 3) Pageable pageableUser) {
         var usersList = userService.getAllUsers(pageableUser);
         return new ResponseEntity<>(usersList, HttpStatus.OK);
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<UserResponseDTO> detailUser(@PathVariable Long id) {
+    public ResponseEntity<UserResponse> detailUser(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getUserDetails(id));
     }
 

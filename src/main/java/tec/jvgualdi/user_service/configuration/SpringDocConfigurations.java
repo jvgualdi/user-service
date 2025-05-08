@@ -1,6 +1,5 @@
 package tec.jvgualdi.user_service.configuration;
 
-import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
