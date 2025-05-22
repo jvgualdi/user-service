@@ -6,6 +6,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import tec.jvgualdi.user_service.domain.enums.UserRole;
+import tec.jvgualdi.user_service.domain.enums.UserStatus;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -22,15 +23,12 @@ public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-
-    @Column(nullable = false, unique = true, length = 50)
-    private String name;
+    private Long id;
 
     @Column(nullable = false, unique = true, length = 50)
     private String email;
 
-    @Column(nullable = false, length = 50)
+    @Column(nullable = false)
     private String password;
 
     @Enumerated(EnumType.STRING)
@@ -41,7 +39,7 @@ public class User implements UserDetails {
     private boolean verified = false;
 
     @Column(nullable = false)
-    private boolean active = true;
+    private UserStatus status = UserStatus.PENDING;
 
     @Column(nullable = false)
     private LocalDateTime created = LocalDateTime.now();
@@ -58,12 +56,12 @@ public class User implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return true;
+        return this.status != UserStatus.INACTIVE && this.status != UserStatus.SUSPENDED && this.status != UserStatus.DELETED;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return this.verified;
     }
 
     @Override

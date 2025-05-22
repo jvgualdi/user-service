@@ -6,9 +6,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import tec.jvgualdi.user_service.domain.entity.User;
 import tec.jvgualdi.user_service.dto.AuthRequest;
-import tec.jvgualdi.user_service.dto.UserResponse;
 import tec.jvgualdi.user_service.security.TokenServiceJWT;
 import tec.jvgualdi.user_service.security.JWTTokenDTO;
 
@@ -31,12 +29,6 @@ public class AuthenticationController {
         var jwtToken = tokenService.generateToken(authentication);
 
         return ResponseEntity.ok(new JWTTokenDTO(jwtToken));
-    }
-
-    @GetMapping("/me")
-    public ResponseEntity<UserResponse> getCurrentUser(Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
-        return ResponseEntity.ok(new UserResponse(user));
     }
 
 }

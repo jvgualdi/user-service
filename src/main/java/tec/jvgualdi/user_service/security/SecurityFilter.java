@@ -4,9 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -14,7 +12,6 @@ import tec.jvgualdi.user_service.domain.entity.User;
 import tec.jvgualdi.user_service.repository.UserRepository;
 
 import java.io.IOException;
-import java.util.List;
 
 @Component
 public class SecurityFilter extends OncePerRequestFilter {
@@ -32,7 +29,6 @@ public class SecurityFilter extends OncePerRequestFilter {
         var token = recoverToken(request);
         if (token != null ) {
             var subject = tokenServiceJWT.getJWTSubject(token);
-            var role = tokenServiceJWT.extractRole(token);
 
             User userAuth = userRepository.findByEmail(subject)
                     .orElseThrow(() -> new RuntimeException("User not found"));
@@ -40,7 +36,7 @@ public class SecurityFilter extends OncePerRequestFilter {
             var authentication = new UsernamePasswordAuthenticationToken(
                     userAuth,
                     null,
-                    List.of(new SimpleGrantedAuthority("ROLE_" + role))
+                    userAuth.getAuthorities()
             );
 
             SecurityContextHolder.getContext().setAuthentication(authentication);

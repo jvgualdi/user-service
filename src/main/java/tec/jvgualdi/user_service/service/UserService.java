@@ -1,14 +1,14 @@
 package tec.jvgualdi.user_service.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import tec.jvgualdi.user_service.domain.enums.UserRole;
 import tec.jvgualdi.user_service.domain.entity.User;
-import tec.jvgualdi.user_service.dto.EmployeeRequest;
-import tec.jvgualdi.user_service.dto.UserRequest;
+import tec.jvgualdi.user_service.domain.enums.UserRole;
+import tec.jvgualdi.user_service.domain.enums.UserStatus;
 import tec.jvgualdi.user_service.dto.UserResponse;
 import tec.jvgualdi.user_service.repository.UserRepository;
 
@@ -18,56 +18,46 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional
-    public UserResponse createEmployee(EmployeeRequest employeeDTO) {
-        if (userRepository.existsByEmail(employeeDTO.user().email())) {
-            throw new IllegalArgumentException("Email already in use");
-        }
-
-        User employee = new User();
-        employee.setEmail(employeeDTO.user().email());
-        employee.setName(employeeDTO.user().name());
-        employee.setPassword(passwordEncoder.encode(employeeDTO.user().password()));
-        employee.setRole(UserRole.EMPLOYEE);
-        employee.setVerified(true);
-
-        return new UserResponse(userRepository.save(employee));
-    }
-
-    @Transactional
-    public UserResponse createUser(UserRequest user) {
-        if (userRepository.existsByEmail(user.email())) {
-            throw new IllegalArgumentException("User already exists");
-        }
+    public User createUser(String email, String password, UserRole role) {
 
         User newUser = new User();
-        newUser.setEmail(user.email());
-        newUser.setName(user.name());
-        newUser.setPassword(passwordEncoder.encode(user.password()));
-        newUser.setRole(UserRole.CUSTOMER);
-        return new UserResponse(userRepository.save(newUser));
+        newUser.setEmail(email);
+        newUser.setPassword(passwordEncoder.encode(password));
+        newUser.setRole(role);
+        return userRepository.save(newUser);
     }
 
 
     public Page<UserResponse> getAllUsers(Pageable pageableUser) {
-        return this.userRepository.findAllByActiveTrue(pageableUser).map(UserResponse::new);
+        var users = userRepository.findAllByActiveTrue(pageableUser);
+        return users.map(user -> new UserResponse(user.getId(), user.getEmail(), user.getCreated(), user.isAccountNonExpired()));
     }
 
     public UserResponse getUserDetails(Long userId) {
-        return new UserResponse(this.userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found")));
+        var user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        return new UserResponse(user.getId(), user.getEmail(), user.getCreated(), user.isAccountNonLocked());
     }
 
     @Transactional
     public void deleteUser(Long userId){
         var user = this.userRepository.findById(userId).
                 orElseThrow(() -> new IllegalArgumentException("User not found"));
-        user.setActive(false);
+        user.setStatus(UserStatus.DELETED);
     }
 
+    @Transactional
+    public void activateUser(Long userId) {
+        var user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        user.setStatus(UserStatus.ACTIVE);
+        user.setVerified(true);
+    }
 }
