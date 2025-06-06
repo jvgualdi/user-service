@@ -42,7 +42,7 @@ public class User implements UserDetails {
     private UserStatus status = UserStatus.PENDING;
 
     @Column(nullable = false)
-    private LocalDateTime created = LocalDateTime.now();
+        private LocalDateTime created = LocalDateTime.now();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

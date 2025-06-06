@@ -36,7 +36,7 @@ public class UserService {
 
 
     public Page<UserResponse> getAllUsers(Pageable pageableUser) {
-        var users = userRepository.findAllByActiveTrue(pageableUser);
+        var users = userRepository.findAllByVerifiedTrue(pageableUser);
         return users.map(user -> new UserResponse(user.getId(), user.getEmail(), user.getCreated(), user.isAccountNonExpired()));
     }
 

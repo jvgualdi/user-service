@@ -21,9 +21,8 @@ import tec.jvgualdi.user_service.security.TokenServiceJWT;
 @RequiredArgsConstructor
 public class CustomerService {
 
-    @Value("${app.frontend.base-url}")
-    private String frontendBaseUrl;
-
+    @Value("${app.base-url}")
+    private String baseUrl;
     private final UserService userService;
     private final TokenServiceJWT tokenService;
     private  final CustomerRepository customerRepository;
@@ -46,7 +45,7 @@ public class CustomerService {
                 dto.phoneNumber(),
                 dto.address()
         );
-        String link = "https://your-domain.com/customers/verify?token=" + emailToken;
+        String link = baseUrl + "/customers/verify?token=" + emailToken;
         EmailRequest emailReq = new EmailRequest(
                 user.getEmail(),
                 "Please verify your account",

@@ -1,13 +1,10 @@
 server:
-  port: 8081
+  port: 0
   error:
     include-stacktrace: never
 
-app:
-  frontend:
-    base-url: ${APP_FRONTEND_BASE_URL:http://localhost:8080}
-
 spring:
+  application.name: user-service
   profiles:
     active: dev
   datasource:
@@ -33,7 +30,15 @@ spring:
     port: 5672
     username: guest
     password: guest
-    queue: user-service.email.queue
+    queue: ${queue.name}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8087/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+
 
 logging:
   level:
@@ -44,3 +49,6 @@ logging:
 security:
     jwt:
       secret: ${JWT_SECRET:12345678}
+
+app:
+  base-url: http://localhost:${server.port} #Deve apontar para o serviço gateway
