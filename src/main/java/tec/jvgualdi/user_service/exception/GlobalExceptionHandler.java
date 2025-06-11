@@ -63,6 +63,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro: " +ex.getLocalizedMessage());
     }
 
+    @ExceptionHandler(InvalidJwtException.class)
+    public ResponseEntity<String> handleInvalidJwtException(InvalidJwtException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
+    }
+
     private record ValidationError (String field, String message) {
         public ValidationError (FieldError error){
             this(error.getField(), error.getDefaultMessage());

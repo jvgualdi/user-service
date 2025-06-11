@@ -8,7 +8,7 @@ import tec.jvgualdi.user_service.dto.CustomerResponse;
 
 @Mapper(componentModel = "spring")
 public interface CustomerMapper {
-    @Mapping(source = "customer.email", target = "email")
+    @Mapping(source = "customer.user.email", target = "email")
     CustomerResponse toResponse(Customer customer);
 
     Customer toEntity(CustomerRegistrationRequest customerRegistrationRequest);

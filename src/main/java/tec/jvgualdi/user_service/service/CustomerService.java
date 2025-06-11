@@ -23,6 +23,8 @@ public class CustomerService {
 
     @Value("${app.base-url}")
     private String baseUrl;
+    @Value("${app.email.from}")
+    private String emailFrom;
     private final UserService userService;
     private final TokenServiceJWT tokenService;
     private  final CustomerRepository customerRepository;
@@ -49,7 +51,9 @@ public class CustomerService {
         EmailRequest emailReq = new EmailRequest(
                 user.getEmail(),
                 "Please verify your account",
-                "Hi " + dto.name() + ",\n\nClick here to verify: " + link
+                "Hi " + dto.name() + ",\n\nClick here to verify: " + link,
+                emailFrom,
+                "JVGualdi User Service <" +emailFrom + ">"
         );
 
         // publish to RabbitMQ

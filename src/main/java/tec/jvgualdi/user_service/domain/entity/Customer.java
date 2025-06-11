@@ -26,7 +26,7 @@ public class Customer {
     @Embedded
     private CustomerAddress address;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "phone_number")
     private String phoneNumber;
 
 }

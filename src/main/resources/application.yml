@@ -51,4 +51,6 @@ security:
       secret: ${JWT_SECRET:12345678}
 
 app:
-  base-url: http://localhost:${server.port} #Deve apontar para o serviço gateway
+  base-url: http://localhost:${GATEWAY_PORT} #Deve apontar para o serviço gateway
+  email:
+    from: ${EMAIL_FROM}

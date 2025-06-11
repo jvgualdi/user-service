@@ -28,7 +28,7 @@ public class User implements UserDetails {
     @Column(nullable = false, unique = true, length = 50)
     private String email;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "password_hash")
     private String password;
 
     @Enumerated(EnumType.STRING)
@@ -41,7 +41,7 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private UserStatus status = UserStatus.PENDING;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "created_at")
         private LocalDateTime created = LocalDateTime.now();
 
     @Override

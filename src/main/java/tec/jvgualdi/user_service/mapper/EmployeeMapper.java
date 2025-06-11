@@ -8,7 +8,7 @@ import tec.jvgualdi.user_service.dto.EmployeeResponse;
 
 @Mapper(componentModel = "spring")
 public interface EmployeeMapper {
-    @Mapping(source = "employee.email", target = "email")
+    @Mapping(source = "employee.user.email", target = "email")
     EmployeeResponse toResponse(Employee employee);
     Employee toEntity(EmployeeRequest employeeRequest);
 
